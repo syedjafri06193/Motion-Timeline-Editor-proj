@@ -1,0 +1,35 @@
+{
+  "name": "motion-timeline-editor",
+  "version": "1.0.0",
+  "description": "Keyframe editor with bezier easing, onion skinning, and Lottie/CSS export with an honest capability analysis",
+  "scripts": {
+    "dev": "vite -c src/app/vite.config.ts",
+    "build": "vite build -c src/app/vite.config.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:browser": "vite build -c tests/browser/vite.config.ts && node tests/browser/run.mjs",
+    "docs:matrix": "tsx scripts/matrix-doc.ts",
+    "export": "tsx scripts/export.ts"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/pngjs": "^6.0.5",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.5",
+    "vitest": "^3.2.7"
+  },
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20.11"
+  },
+  "dependencies": {
+    "lottie-web": "^5.13.0",
+    "gifenc": "^1.0.3",
+    "fflate": "^0.8.3"
+  }
+}
