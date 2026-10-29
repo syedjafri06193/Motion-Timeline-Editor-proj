@@ -48,6 +48,43 @@ All documentation lives in [`1—Documentation/`](1—Documentation/README.md):
 - [easing evaluation](1—Documentation/v1/easing.md)
 - [using the editor](1—Documentation/v1/editor.md)
 
+<!-- project-metrics:start -->
+## Project Metrics
+
+[![Stars](https://img.shields.io/github/stars/syedjafri06193/Motion-Timeline-Editor-proj?style=flat-square)](https://github.com/syedjafri06193/Motion-Timeline-Editor-proj/stargazers) [![Forks](https://img.shields.io/github/forks/syedjafri06193/Motion-Timeline-Editor-proj?style=flat-square)](https://github.com/syedjafri06193/Motion-Timeline-Editor-proj/forks) [![Open issues](https://img.shields.io/github/issues/syedjafri06193/Motion-Timeline-Editor-proj?style=flat-square)](https://github.com/syedjafri06193/Motion-Timeline-Editor-proj/issues) [![Last commit](https://img.shields.io/github/last-commit/syedjafri06193/Motion-Timeline-Editor-proj/improvements?style=flat-square)](https://github.com/syedjafri06193/Motion-Timeline-Editor-proj/commits/improvements) [![Commits](https://img.shields.io/github/commit-activity/t/syedjafri06193/Motion-Timeline-Editor-proj?style=flat-square)](https://github.com/syedjafri06193/Motion-Timeline-Editor-proj/commits/improvements) [![Top language](https://img.shields.io/github/languages/top/syedjafri06193/Motion-Timeline-Editor-proj?style=flat-square)](https://github.com/syedjafri06193/Motion-Timeline-Editor-proj) [![Repo size](https://img.shields.io/github/repo-size/syedjafri06193/Motion-Timeline-Editor-proj?style=flat-square)](https://github.com/syedjafri06193/Motion-Timeline-Editor-proj)
+
+### Code
+
+| Metric | Value |
+|---|---|
+| Lines of code | 2,932 |
+| Source files | 51 |
+| Tracked files | 68 |
+| Documentation | 8 Markdown files (11,530 words), 2 PDF |
+| Commits | 9 |
+| Contributors | 1 |
+| Active | 2026-09-11 → 2026-10-29 |
+
+| Language | Lines | Share |
+|---|---:|---:|
+| TypeScript | 2,758 | 94.1% |
+| HTML | 92 | 3.1% |
+| JavaScript | 82 | 2.8% |
+
+### Performance
+
+| Metric | Result |
+|---|---|
+| Preview + onion skin, p99 frame | **10.4 ms** (20 layers), 8.7 ms (50) |
+| Timeline redraw, p99, 50 layers | **1.7 ms** |
+| Lottie export vs preview | 0.000% pixels differ (worst of 30 frames) |
+| CSS export vs preview | 0.000% baked, 0.002% offset-path |
+
+<sub>Measured figures recorded in [`1—Documentation/v1/stretch-goals.md`](1%E2%80%94Documentation/v1/stretch-goals.md).</sub>
+
+<sub>Code stats as of 2026-10-29, counted with pygount (comments and blank lines excluded). Badges update live.</sub>
+<!-- project-metrics:end -->
+
 ## Licence
 
 [MIT](LICENSE). Dependencies: lottie-web (MIT), gifenc (MIT), fflate (MIT).
