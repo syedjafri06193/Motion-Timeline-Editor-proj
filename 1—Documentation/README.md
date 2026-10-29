@@ -12,4 +12,13 @@ All project documentation lives in this folder. The project overview and quick s
 - [Motion Timeline Editor — Design & Build Guide](design-guide.md)
 - [Motion timeline editor](motion-timeline-editor.pdf) — PDF
 
+
+### v1 implementation
+
+- [Export capability matrix](v1/export-matrix.md)
+- [Lottie subset](v1/lottie-subset.md)
+- [Easing evaluation](v1/easing.md)
+- [Using the editor](v1/editor.md)
+- [Stretch goals and milestones](v1/stretch-goals.md)
+
 <!-- docs-index:end -->

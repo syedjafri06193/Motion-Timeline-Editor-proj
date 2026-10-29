@@ -1,0 +1,39 @@
+name: v1
+
+on:
+  push:
+    paths: ["v1/**", ".github/workflows/v1.yml"]
+  pull_request:
+    paths: ["v1/**", ".github/workflows/v1.yml"]
+
+defaults:
+  run:
+    working-directory: v1
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: v1/package-lock.json }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Export matrix doc is up to date
+        run: npm run docs:matrix && git diff --exit-code -- "../1—Documentation/v1/export-matrix.md"
+
+  browsers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: v1/package-lock.json }
+      - run: npm ci
+      - run: npm install --no-save playwright@1 && npx playwright install --with-deps chromium firefox webkit
+      - name: Easing vs WAAPI, preview vs lottie-web vs CSS, scrub performance
+        run: npm run test:browser
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with: { name: pixel-diffs, path: v1/out/browser }
