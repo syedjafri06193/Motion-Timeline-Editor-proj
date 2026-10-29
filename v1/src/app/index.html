@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Motion Timeline Editor</title>
+<style>
+  :root { --bg:#f3f2ef; --panel:#ffffff; --panel2:#f8f7f5; --ink:#1c1b19; --muted:#6f6b63; --line:#dedad2; --accent:#3b6cf6; --key:#8a857b; --warn:#c2410c; --ok:#15803d; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#121212; --panel:#1b1b1a; --panel2:#222220; --ink:#ebe9e4; --muted:#9b978e; --line:#33322f; --accent:#6c8cff; --key:#a39f95; --warn:#fb923c; --ok:#4ade80; color-scheme: dark; } }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { font: 13px/1.4 system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); display: grid; grid-template-rows: auto 1fr 280px; height: 100vh; }
+  header { display: flex; gap: 8px; align-items: center; padding: 8px 12px; background: var(--panel); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  header h1 { font-size: 13px; font-weight: 650; margin: 0 12px 0 0; letter-spacing: .02em; }
+  button, select, input { font: inherit; color: inherit; }
+  button { background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 4px 9px; cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button[aria-pressed="true"] { background: var(--panel2); border-color: var(--ink); }
+  select, input[type=number], input[type=text] { background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; }
+  input[type=number] { width: 72px; }
+  .sep { width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
+  #time { font-variant-numeric: tabular-nums; min-width: 120px; color: var(--muted); }
+  main { display: grid; grid-template-columns: 1fr 340px; min-height: 0; }
+  #viewport { position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 12px; gap: 12px; }
+  #viewport canvas, #lottieView { background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,.12); max-width: 100%; max-height: 100%; }
+  #lottieView { position: relative; }
+  .label { position: absolute; top: 6px; left: 8px; font-size: 11px; color: var(--muted); }
+  aside { background: var(--panel); border-left: 1px solid var(--line); overflow: auto; }
+  section { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+  .prop { display: grid; grid-template-columns: 70px 1fr auto; gap: 6px; align-items: center; margin: 4px 0; }
+  .prop .vals { display: flex; gap: 4px; }
+  .prop button { padding: 1px 6px; }
+  .keyed { color: var(--accent); }
+  #curve { width: 100%; height: 170px; display: block; border-radius: 6px; }
+  #presets { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; max-height: 120px; overflow: auto; }
+  #presets button { font-size: 11px; padding: 2px 6px; }
+  #presets button.lin::after { content: " linear()"; color: var(--warn); font-size: 10px; }
+  #analysis li { margin: 3px 0; } .exact { color: var(--ok); } .approximated { color: var(--accent); } .baked { color: var(--warn); } .unrepresentable { color: #dc2626; }
+  #bottom { display: grid; grid-template-rows: auto 1fr; background: var(--panel); border-top: 1px solid var(--line); min-height: 0; }
+  #bottom .tabs { display: flex; gap: 6px; padding: 6px 10px; border-bottom: 1px solid var(--line); align-items: center; }
+  #timeline, #graph { width: 100%; height: 100%; display: block; }
+  .hint { color: var(--muted); font-size: 11px; margin-left: auto; }
+  #matrix { width: 100%; border-collapse: collapse; font-size: 11px; } #matrix td, #matrix th { border-bottom: 1px solid var(--line); padding: 3px 4px; text-align: left; }
+  dialog { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); max-width: 720px; }
+  pre { white-space: pre-wrap; max-height: 50vh; overflow: auto; background: var(--panel2); padding: 8px; border-radius: 6px; font-size: 11px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Motion Timeline Editor</h1>
+  <button id="play" title="Play / pause (Space)">▶</button>
+  <span id="time">0.000 s · f0</span>
+  <span class="sep"></span>
+  <button id="undo" title="Undo (⌘Z)">↶</button><button id="redo" title="Redo (⇧⌘Z)">↷</button>
+  <span class="sep"></span>
+  <button id="onion" aria-pressed="false" title="Onion skin (O)">Onion</button>
+  <select id="onionMode" title="Onion skin step"><option value="frames">every 2 frames</option><option value="keyframes">keyframes</option></select>
+  <button id="path" aria-pressed="false" title="Motion path (P)">Path</button>
+  <button id="blur" aria-pressed="false" title="Motion blur">Blur</button>
+  <button id="compare" aria-pressed="false" title="Show lottie-web next to the preview">vs lottie-web</button>
+  <span class="sep"></span>
+  <label>Target <select id="target"><option value="both">Lottie + CSS</option><option value="lottie">Lottie</option><option value="css">CSS</option></select></label>
+  <label><input type="checkbox" id="offsetPath" /> offset-path</label>
+  <span class="sep"></span>
+  <button id="import">Import…</button><input id="file" type="file" accept=".json,.lottie,.svg" hidden /><button id="audioBtn" title="Load an audio track to time against">Audio…</button><input id="audioFile" type="file" accept="audio/*" hidden />
+  <button id="expLottie" class="primary">Lottie</button><button id="expDot">.lottie</button><button id="expCss">CSS</button><button id="expGif">GIF</button><button id="expVideo">WebM</button>
+  <select id="scene" title="Demo scene"><option value="bounce">Demo: bounce & spin</option><option value="many20">20 layers</option><option value="many50">50 layers</option></select>
+</header>
+<main>
+  <div id="viewport"><canvas id="preview"></canvas><div id="lottieView" hidden><span class="label">lottie-web</span></div></div>
+  <aside>
+    <section><h2>Layer <span id="layerName"></span></h2><div id="inspector"></div></section>
+    <section><h2>Segment easing</h2><canvas id="curve"></canvas><div id="curveInfo" class="hint" style="margin-top:4px"></div><div id="presets"></div></section>
+    <section><h2>Export analysis</h2><div id="analysisTabs" style="margin-bottom:6px"><button data-t="css" aria-pressed="true">CSS</button> <button data-t="lottie" aria-pressed="false">Lottie</button></div><ul id="analysis" style="padding-left:16px;margin:0"></ul></section>
+    <section><h2>Capability matrix</h2><table id="matrix"></table></section>
+  </aside>
+</main>
+<div id="bottom">
+  <div class="tabs"><button id="tabTimeline" aria-pressed="true">Timeline</button><button id="tabGraph" aria-pressed="false">Value graph</button>
+    <span class="hint">K add key · H hold · ⌫ delete · R reverse · ⌘C/⌘V copy/paste · ⌘A select all · drag selection edge to retime · ⌘-drag disables snapping</span></div>
+  <div style="position:relative;min-height:0"><canvas id="timeline"></canvas><canvas id="graph" hidden></canvas></div>
+</div>
+<dialog id="dlg"><h3 id="dlgTitle" style="margin-top:0"></h3><div id="dlgBody"></div><p style="text-align:right;margin-bottom:0"><button id="dlgClose">Close</button> <button id="dlgOk" class="primary">Download</button></p></dialog>
+<script type="module" src="./main.ts"></script>
+</body>
+</html>
